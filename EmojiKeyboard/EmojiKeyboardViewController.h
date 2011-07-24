@@ -20,6 +20,9 @@
 -(id)initWithFrame:(CGRect)frame;
 - (void)addEmojiKeys:(NSNotification*)note;
 - (NSArray*)initIconsList;
+- (void)emojiBtn_pressed:(id)sender;
+- (void)keyboardWillShow:(NSNotification*)note;
+- (void)keyboardDidShow:(NSNotification*)note;
 
 @property (retain, nonatomic) UITextView    *inputText;
 @property (retain, nonatomic) NSArray       *icons;

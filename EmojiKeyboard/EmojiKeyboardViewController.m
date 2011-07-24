@@ -148,12 +148,6 @@
     }
 }
 
-- (void)emojiBtn_pressed:(id)sender {
-    UIButton *btn = (UIButton*)sender;
-    EmojiIcon *e = [icons objectAtIndex:btn.tag];
-    inputText.text = [[NSString alloc] initWithFormat:@"%@%@", inputText.text, e.codeName];
-}
-
 - (void)addEmojiKeys:(NSNotification*)note {
     CGRect _keyboardEndFrame;
     [[note.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] getValue:&_keyboardEndFrame];
@@ -200,5 +194,12 @@
 	}
     //[emojiKeyboard release];
 }
+
+- (void)emojiBtn_pressed:(id)sender {
+    UIButton *btn = (UIButton*)sender;
+    EmojiIcon *e = [icons objectAtIndex:btn.tag];
+    inputText.text = [[NSString alloc] initWithFormat:@"%@%@", inputText.text, e.codeName];
+}
+
 
 @end

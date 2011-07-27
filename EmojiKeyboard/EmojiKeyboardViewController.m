@@ -8,6 +8,7 @@
 
 #import "EmojiKeyboardViewController.h"
 #import <QuartzCore/QuartzCore.h>
+#import "HorizontalTableView.h"
 
 @implementation EmojiIcon
 @synthesize iconName, codeName;
@@ -27,6 +28,7 @@
 @implementation EmojiKeyboardViewController
 @synthesize inputText;
 @synthesize icons;
+@synthesize emojiKeyboard;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -49,6 +51,29 @@
         self.inputText = txt;
         [self.view addSubview:self.inputText];
         [txt release];
+        
+        CGRect bounds = [[UIScreen mainScreen] bounds];
+        HorizontalTableView *tmpKB = [[HorizontalTableView alloc] init];
+        tmpKB.backgroundColor = [UIColor lightGrayColor];
+        tmpKB.frame = CGRectMake(0, -50, bounds.size.height, 50);  // work for portrait and landscape
+        
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = tmpKB.bounds;
+        gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor grayColor] CGColor], (id)[[UIColor lightGrayColor] CGColor], nil];
+        gradient.startPoint = CGPointMake(0, 1);
+        gradient.endPoint = CGPointMake(0, 0);
+        
+        [tmpKB.layer insertSublayer:gradient atIndex:0];
+        
+        [tmpKB setDelegate:self];
+        self.emojiKeyboard = tmpKB;
+                
+        // show icons
+        [emojiKeyboard refreshData];
+        
+        //[self.emojiKeyboard performSelector:@selector(refreshData) withObject:nil afterDelay:0.3f];
+
+        [tmpKB release];
     }
     return self;
 }
@@ -88,6 +113,8 @@
 	}
     
     self.icons = [self initIconsList];
+
+
     [super viewDidLoad];
 }
 
@@ -109,7 +136,23 @@
     [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"13.gif" andCode:@"(angry)"] autorelease]];
     [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"14.gif" andCode:@"(annoyed)"] autorelease]];
     [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"15.gif" andCode:@"(K)"] autorelease]];
-
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"16.gif" andCode:@"(wave)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"17.gif" andCode:@"B-)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"18.gif" andCode:@"(cozy)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"19.gif" andCode:@"(sick)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"20.gif" andCode:@"(:"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"21.gif" andCode:@"(goodluck)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"22.png" andCode:@"(griltongue)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"23.gif" andCode:@"(mmm)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"24.gif" andCode:@"(hungry)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"25.gif" andCode:@"(music)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"26.gif" andCode:@"(tears)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"27.gif" andCode:@"(tongue)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"28.gif" andCode:@"(unsure)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"29.gif" andCode:@"(highfive)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"30.gif" andCode:@"(dance)"] autorelease]];
+    [tmp addObject:[[[EmojiIcon alloc] initWithFilename:@"31.gif" andCode:@"(blush)"] autorelease]];
+    
     return [tmp autorelease];
 }
 
@@ -137,44 +180,18 @@
 - (void)keyboardWillShow:(NSNotification*)note {
     // if clause is just an additional precaution, you could also dismiss it
 	if ([[[UIDevice currentDevice] systemVersion] floatValue] < 3.2) {
-		[self addEmojiKeys:note];
+		[self addEmojiKeyboard:note];
 	}
 }
 
 - (void)keyboardDidShow:(NSNotification*)note {
     // if clause is just an additional precaution, you could also dismiss it
 	if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 3.2) {
-		[self addEmojiKeys:note];
+		[self addEmojiKeyboard:note];
     }
 }
 
-- (void)addEmojiKeys:(NSNotification*)note {
-    CGRect _keyboardEndFrame;
-    [[note.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] getValue:&_keyboardEndFrame];
-        
-    
-    UIView *emojiKeyboard = [[[UIView alloc] init] autorelease];
-    emojiKeyboard.backgroundColor = [UIColor lightGrayColor];
-    emojiKeyboard.frame = CGRectMake(0, -50, _keyboardEndFrame.size.width, 50);
-
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = emojiKeyboard.bounds;
-    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor grayColor] CGColor], (id)[[UIColor lightGrayColor] CGColor], nil];
-    gradient.startPoint = CGPointMake(0, 1);
-    gradient.endPoint = CGPointMake(0, 0);
-    [emojiKeyboard.layer insertSublayer:gradient atIndex:0];
-    
-    int idx = 0;
-    for (EmojiIcon *e in icons) {
-        UIButton *btn = [[UIButton alloc] initWithFrame: CGRectMake(idx * 50, 5, 40, 40)];
-        [btn setImage:[UIImage imageNamed:e.iconName] forState:UIControlStateNormal];
-        btn.tag = idx;
-        [btn addTarget:self action:@selector(emojiBtn_pressed:) forControlEvents:UIControlEventTouchUpInside];
-        idx ++;
-        [emojiKeyboard addSubview:btn];
-        [btn release];
-    }
-        
+- (void)addEmojiKeyboard:(NSNotification*)note {        
     UIWindow *keyboardWindow = [[[UIApplication sharedApplication] windows] objectAtIndex:1];
 	UIView* keyboard;
 	for(int i = 0; i < [keyboardWindow.subviews count]; i++)
@@ -192,13 +209,41 @@
 				[keyboard addSubview:emojiKeyboard];
 		}
 	}
-    //[emojiKeyboard release];
 }
 
 - (void)emojiBtn_pressed:(id)sender {
     UIButton *btn = (UIButton*)sender;
     EmojiIcon *e = [icons objectAtIndex:btn.tag];
     inputText.text = [[NSString alloc] initWithFormat:@"%@%@", inputText.text, e.codeName];
+}
+
+#pragma mark -
+#pragma mark HorizontalTableViewDelegate methods
+
+- (NSInteger)numberOfColumnsForTableView:(HorizontalTableView *)tableView {
+    return [icons count];
+}
+
+- (UIView *)tableView:(HorizontalTableView *)aTableView viewForIndex:(NSInteger)index {
+    UIView *vw = [aTableView dequeueColumnView];
+    if (!vw) {
+        vw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
+    }
+    
+    vw.backgroundColor = [UIColor clearColor];
+    UIButton *btn = [[UIButton alloc] initWithFrame: CGRectMake(0, 0, 40, 40)];
+    EmojiIcon *e = [icons objectAtIndex:index];
+    [btn setImage:[UIImage imageNamed:e.iconName] forState:UIControlStateNormal];
+    btn.tag = index;
+    [btn addTarget:self action:@selector(emojiBtn_pressed:) forControlEvents:UIControlEventTouchUpInside];
+    [vw addSubview:btn];
+    [btn release];
+
+    return vw;
+}
+
+- (CGFloat)columnWidthForTableView:(HorizontalTableView *)tableView {
+    return 40.0f;
 }
 
 

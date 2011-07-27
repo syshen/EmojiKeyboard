@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "HorizontalTableView.h"
 
 @interface EmojiIcon : NSObject
 - (id)initWithFilename:(NSString *)aFilename andCode:(NSString*)theCode;
@@ -15,16 +16,19 @@
 
 @end
 
-@interface EmojiKeyboardViewController : UIViewController <UITextViewDelegate> 
+@interface EmojiKeyboardViewController : UIViewController <UITextViewDelegate, HorizontalTableViewDelegate> {
+    HorizontalTableView *emojiKeyboard;
+}
 
 -(id)initWithFrame:(CGRect)frame;
-- (void)addEmojiKeys:(NSNotification*)note;
+- (void)addEmojiKeyboard:(NSNotification*)note;
 - (NSArray*)initIconsList;
 - (void)emojiBtn_pressed:(id)sender;
 - (void)keyboardWillShow:(NSNotification*)note;
 - (void)keyboardDidShow:(NSNotification*)note;
 
-@property (retain, nonatomic) UITextView    *inputText;
-@property (retain, nonatomic) NSArray       *icons;
+@property (retain, nonatomic) UITextView            *inputText;
+@property (retain, nonatomic) NSArray               *icons;
+@property (retain, nonatomic) HorizontalTableView   *emojiKeyboard;
 
 @end

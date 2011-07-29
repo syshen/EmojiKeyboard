@@ -34,7 +34,6 @@
 
 - (void)refreshData {
     self.pageViews = [NSMutableArray array];
-    NSLog(@"refreshData");
 	// to save time and memory, we won't load the page views immediately
 	NSUInteger numberOfPhysicalPages = [self numberOfPages];
 	for (NSUInteger i = 0; i < numberOfPhysicalPages; ++i)

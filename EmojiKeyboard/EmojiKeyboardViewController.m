@@ -52,28 +52,8 @@
         [self.view addSubview:self.inputText];
         [txt release];
         
-        CGRect bounds = [[UIScreen mainScreen] bounds];
-        HorizontalTableView *tmpKB = [[HorizontalTableView alloc] init];
-        tmpKB.backgroundColor = [UIColor lightGrayColor];
-        tmpKB.frame = CGRectMake(0, -50, bounds.size.height, 50);  // work for portrait and landscape
-        
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-        gradient.frame = tmpKB.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor grayColor] CGColor], (id)[[UIColor lightGrayColor] CGColor], nil];
-        gradient.startPoint = CGPointMake(0, 1);
-        gradient.endPoint = CGPointMake(0, 0);
-        
-        [tmpKB.layer insertSublayer:gradient atIndex:0];
-        
-        [tmpKB setDelegate:self];
-        self.emojiKeyboard = tmpKB;
                 
-        // show icons
-        [emojiKeyboard refreshData];
-        
-        //[self.emojiKeyboard performSelector:@selector(refreshData) withObject:nil afterDelay:0.3f];
 
-        [tmpKB release];
     }
     return self;
 }
@@ -167,7 +147,7 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
 }
 
 - (void)dealloc {
@@ -192,6 +172,31 @@
 }
 
 - (void)addEmojiKeyboard:(NSNotification*)note {        
+    CGRect  bounds = [[UIScreen mainScreen] bounds];
+    
+    HorizontalTableView *tmpKB = [[HorizontalTableView alloc] init];
+    tmpKB.backgroundColor = [UIColor lightGrayColor];
+    if (UIDeviceOrientationIsPortrait( self.interfaceOrientation )) {
+        tmpKB.frame = CGRectMake(0, -50, bounds.size.width, 50);
+    } else if (UIDeviceOrientationIsLandscape( self.interfaceOrientation )) {
+        tmpKB.frame = CGRectMake(0, -50, bounds.size.height, 50);
+    } 
+    
+    CAGradientLayer *gradient = [CAGradientLayer layer];
+    gradient.frame = tmpKB.bounds;
+    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor grayColor] CGColor], (id)[[UIColor lightGrayColor] CGColor], nil];
+    gradient.startPoint = CGPointMake(0, 1);
+    gradient.endPoint = CGPointMake(0, 0);
+    
+    [tmpKB.layer insertSublayer:gradient atIndex:0];
+    
+    [tmpKB setDelegate:self];
+    self.emojiKeyboard = tmpKB;
+    [tmpKB release];
+
+    // show icons
+    [emojiKeyboard refreshData];
+    
     UIWindow *keyboardWindow = [[[UIApplication sharedApplication] windows] objectAtIndex:1];
 	UIView* keyboard;
 	for(int i = 0; i < [keyboardWindow.subviews count]; i++)

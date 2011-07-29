@@ -219,7 +219,7 @@
 	
 	[self currentPageIndexDidChange];
     
-    CGSize rect = [self.scrollView contentSize];
+   // CGSize rect = [self.scrollView contentSize];
    // DLog(@"CSize = %@", NSStringFromCGSize(rect));
 }
 
